@@ -1,0 +1,247 @@
+sudo usr/bin/vmware-installer -u vmware-player
+
+
+
+virtualbox virtualbox-ext-pack in apt
+sudo apt-get install vagrant
+vagrant init -f hashicorp/bionic64
+vagrant up
+vagrant ssh
+
+
+
+keystone
+for keystone you need mariadb
+provider - fernet
+configure apache http server
+
+
+glance
+
+sudo snap install microstack --beta
+sudo microstack init --auto --control
+10.20.20.1
+sudo snap get microstack. config.credentials.keytone-password
+
+
+
+
+1. Prerequisites
+You must have running hadoop setup on your system. If you don’t have hadoop installed visit Hadoop installation on Linux tutorial.
+
+2. Copy Files to Namenode Filesystem
+After successfully formatting namenode, You must have start all Hadoop services properly. Now create a directory in hadoop filesystem.
+
+$ hdfs dfs -mkdir -p /user/hadoop/input
+Copy copy some text file to hadoop filesystem inside input directory. Here I am copying LICENSE.txt to it. You can copy more that one files.
+
+$ hdfs dfs -put LICENSE.txt /user/hadoop/input/
+3. Running Wordcount Command
+Now run the wordcount mapreduce example using following command. Below command will read all files from input folder and process with mapreduce jar file. After successful completion of task results will be placed on output directory.
+
+$ cd $HADOOP_HOME
+$ hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar wordcount input output
+4. Show Results
+First check the names of result file created under dfs@/user/hadoop/output filesystem using following command.
+
+$ hdfs dfs -ls /user/hadoop/output
+Now show the content of result file where you will see the result of wordcount. You will see the count of each word.
+
+$ hdfs dfs -cat /user/hadoop/output/part-r-00000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hadoop
+● Hadoop is a free, open-source, and Java-based software framework used for
+the storage and processing of large datasets on clusters of machines.
+● Hadoop uses distributed storage and parallel processing to handle big data
+and analytics jobs, breaking workloads down into smaller workloads that can
+be run at the same time.
+Major elements of Hadoop
+1.HDFS-Hadoop Distributed File System
+2.MapReduce
+3. YARN-Yet Another Resource Negotiator
+HDFS
+● HDFS is the primary or major component of Hadoop ecosystem and is
+responsible for storing large data sets of structured or unstructured data
+across various nodes and thereby maintaining the metadata in the form of log
+files.
+● HDFS consists of two core components i.e.
+Name node-data partitioned across the DataNodes
+Data Node-Stores Data
+
+YARN-Yet Another Resource Negotiator, as the name implies, YARN is the
+one who helps to manage the resources across the clusters.
+ MapReduce-MapReduce makes it possible to carry over the processing logic
+and helps to write applications which transform big data sets into a
+manageable one.
+● Map() performs sorting and filtering of data and thereby organizing them
+in the form of group.
+● Reduce(), as the name suggests does the summarization by aggregating
+the mapped data
+Hadoop Installation
+Step 1 – Installing Java
+● sudo apt update
+● sudo apt install openjdk-11-jdk
+verify the installed version of Java with the following command
+● java -version
+Step 2 – Create a Hadoop User
+Create a new user with
+name hadoop
+● sudo adduser hadoop
+Provide and confirm the
+ new password
+ Step 3 – Configure SSH Key-based Authentication
+SSH is primarily used for secure remote access to servers and devices
+Need to configure passwordless SSH authentication for the local system
+1.Change the user to hadoop
+● su - hadoop
+2.Run the following command to generate Public and Private Key Pairs
+● ssh-keygen -t rsa
+3.You will be asked to enter the filename. Just press Enter to complete the
+process.
+4.Append the generated public keys from id_rsa.pub to authorized_keys and set
+proper permission
+● cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+● chmod 640 ~/.ssh/authorized_keys
+5.Verify the passwordless SSH authentication
+● ssh localhost
+Type yes and hit Enter to authenticate the localhost
+Step 4 – Installing Hadoop
+change the user to hadoop
+● su - hadoop
+Download the latest version of Hadoop using the wget command
+● wget https://downloads.apache.org/hadoop/common/hadoop-3.3.0/
+hadoop-3.3.0.tar.gz
+Extract the Downloaded file
+● tar -xvzf hadoop-3.3.0.tar.gz
+● Rename the extracted directory to hadoop
+ mv hadoop-3.3.0 hadoop
+Open the ~/.bashrc fIle ( nano ~/.bashrc)
+● Append the below lines to file.
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export HADOOP_HOME=/home/hadoop/hadoop
+export HADOOP_INSTALL=$HADOOP_HOME
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export HADOOP_YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"
+Save and close the file. Then, activate the environment variables with the following
+command: source ~/.bashrc
+● Set the JAVA_HOME in the Hadoop environment.
+● Open the Hadoop Environment File using the below given command
+nano $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+● Append the java home in the file in the file
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+Step 5 – Configuring Hadoop
+create the namenode and datanode directories inside Hadoop home directory
+● mkdir -p ~/hadoopdata/hdfs/namenode
+● mkdir -p ~/hadoopdata/hdfs/datanode
+Edit the core-site.xml file and update with your system hostname.
+● nano $HADOOP_HOME/etc/hadoop/core-site.xml
+Append the Below given lines in the core-site.xml file
+<configuration>
+<property>
+<name>fs.default.name</name>
+<value>hdfs://localhost:9000</value>
+</property>
+</configuration>
+ 
+● Edit the mapred-site.xml file
+nano $HADOOP_HOME/etc/hadoop/mapred-site.xml
+Append the Below given lines in the mapred-site.xml file
+<configuration>
+<property>
+<name>mapreduce.framework.name</name>
+<value>yarn</value>
+</property>
+</configuration>
+
+Edit the hdfs-site.xml file
+nano $HADOOP_HOME/etc/hadoop/hdfs-site.xml
+Append the Below given lines in the hdfs-site.xml file
+<configuration>
+ <property>
+ <name>dfs.replication</name>
+ <value>1</value>
+ </property>
+ <property>
+ <name>dfs.name.dir</name>
+ <value>file:///home/hadoop/hadoopdata/hdfs/namenode</value>
+ </property>
+ <property>
+ <name>dfs.data.dir</name>
+ <value>file:///home/hadoop/hadoopdata/hdfs/datanode</value>
+ </property>
+</configuration>
+
+Step 6 – Start Hadoop Cluster
+Format the Hadoop Namenode
+● hdfs namenode -format
+Start the Hadoop cluster
+● start-dfs.sh
+ start the YARN service
+● start-yarn.sh
+To verify that the correct processes are running on each server
+● jps
+
+
+
+sudo usr/bin/vmware-installer -u vmware-player
+
+
+
+virtualbox virtualbox-ext-pack in apt
+sudo apt-get install vagrant
+vagrant init -f hashicorp/bionic64
+vagrant up
+vagrant ssh
+
+
+
+keystone
+for keystone you need mariadb
+provider - fernet
+configure apache http server
+
+
+glance
