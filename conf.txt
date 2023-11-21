@@ -1,247 +1,170 @@
-sudo usr/bin/vmware-installer -u vmware-player
-
-
-
-virtualbox virtualbox-ext-pack in apt
-sudo apt-get install vagrant
-vagrant init -f hashicorp/bionic64
-vagrant up
-vagrant ssh
-
-
-
-keystone
-for keystone you need mariadb
-provider - fernet
-configure apache http server
-
-
-glance
-
-sudo snap install microstack --beta
-sudo microstack init --auto --control
-10.20.20.1
-sudo snap get microstack. config.credentials.keytone-password
-
-
-
-
-1. Prerequisites
-You must have running hadoop setup on your system. If you don’t have hadoop installed visit Hadoop installation on Linux tutorial.
-
-2. Copy Files to Namenode Filesystem
-After successfully formatting namenode, You must have start all Hadoop services properly. Now create a directory in hadoop filesystem.
-
-$ hdfs dfs -mkdir -p /user/hadoop/input
-Copy copy some text file to hadoop filesystem inside input directory. Here I am copying LICENSE.txt to it. You can copy more that one files.
-
-$ hdfs dfs -put LICENSE.txt /user/hadoop/input/
-3. Running Wordcount Command
-Now run the wordcount mapreduce example using following command. Below command will read all files from input folder and process with mapreduce jar file. After successful completion of task results will be placed on output directory.
-
-$ cd $HADOOP_HOME
-$ hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar wordcount input output
-4. Show Results
-First check the names of result file created under dfs@/user/hadoop/output filesystem using following command.
-
-$ hdfs dfs -ls /user/hadoop/output
-Now show the content of result file where you will see the result of wordcount. You will see the count of each word.
-
-$ hdfs dfs -cat /user/hadoop/output/part-r-00000
+Exp6.py
+from Crypto.PublicKey import ECC
+from Crypto.Signature import DSS
+from Crypto.Hash import SHA256
+def init_keys(curve, format):
+key = ECC.generate(curve = curve)
+with open('prkey.pem', 'w') as prfile, open('pukey.pem', 'w') as pufile:
+prfile.write(key.export_key(format = format))
+pufile.write(key.public_key().export_key(format = format))
+def get_signature(message, key, mode):
+digest = SHA256.new(message)
+signer = DSS.new(key, mode)
+signature = signer.sign(digest)
+return signature
+def verify(message, key, mode, signature):
+digest = SHA256.new(message)
+verifier = DSS.new(key, mode)
+try:
+verifier.verify(digest, signature)
+except ValueError:
+return False
+else:
+return True
+def main():
+CURVE = 'P-256'
+FORMAT = 'PEM'
+MESSAGE_SENDER = b'Bravo-6, going dark.'
+MESSAGE_RECEIVER = b'Bravo-6, going ark.'
+MODE = 'fips-186-3'
+init_keys(CURVE, FORMAT)
+with open('prkey.pem') as prfile, open('pukey.pem') as pufile:
+prkey = ECC.import_key(prfile.read())
+pukey = ECC.import_key(pufile.read())
+signature = get_signature(MESSAGE_SENDER, prkey, MODE)
+status = verify(MESSAGE_RECEIVER, pukey, MODE, signature)
+print('Authentic') if status else print('Not Authentic')
+if __name__ == '__main__':
+main()
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Hadoop
-● Hadoop is a free, open-source, and Java-based software framework used for
-the storage and processing of large datasets on clusters of machines.
-● Hadoop uses distributed storage and parallel processing to handle big data
-and analytics jobs, breaking workloads down into smaller workloads that can
-be run at the same time.
-Major elements of Hadoop
-1.HDFS-Hadoop Distributed File System
-2.MapReduce
-3. YARN-Yet Another Resource Negotiator
-HDFS
-● HDFS is the primary or major component of Hadoop ecosystem and is
-responsible for storing large data sets of structured or unstructured data
-across various nodes and thereby maintaining the metadata in the form of log
+Ex.No: 9
+Date:
+AIM:
+To demonstrate Intrusion Detection System (IDS) using Snort software tool.
+PROCEDURE:
+1. Download Snort from the Snort.org website. (http://www.snort.org/snortdownloads)
+2. Download Rules(https://www.snort.org/snort-rules). You must register to get the
+rules. (You should download these often)
+3. Double click on the .exe to install snort. This will install snort in the “C:\Snort”
+folder. It is important to have WinPcap (https://www.winpcap.org/install/)installed
+4. Extract the Rules file. You will need WinRAR for the .gzfile.
+5. Copy all files from the “rules” folder of the extracted folder. Now paste the rules 
+into “C:\Snort\rules” folder.
+6. Copy “snort.conf” file from the “etc” folder of the extracted folder. You must
+paste it into “C:\Snort\etc” folder. Overwrite any existing file. Remember if you 
+modify your snort.conf file and download a new file, you must modify it for Snort 
+to work.
+7. Open a command prompt (cmd.exe) and navigate to folder “C:\Snort\bin” folder. 
+(at the Prompt, type cd\snort\bin)
+8. To start (execute) snort in sniffer mode use following command:
+snort -dev -i3
+-i indicates the interface number. You must pick the correct interface number. In my 
+case, it is 3.
+-dev is used to run snort to capture packets on your network.
+DEMONSTRATION OF INTRUSION DETECTION 
+SYSTEM (IDS)
+To check the interface list, use following command:
+snort -W
+Finding an interface
+You can tell which interface to use by looking at the Index number and finding
+Microsoft. As you can see in the above example, the other interfaces are for
+VMWare. My interface is 3.
+9. To run snort in IDS mode, you will need to configure the file“snort.conf”
+according to your networkenvironment.
+10. To specify the network address that you want to protect in snort.conf file,look
+for the following line.
+var HOME_NET 192.168.1.0/24 (You will normally see any here)
+11. You may also want to set the addresses ofDNS_SERVERS, if you have some on 
+yournetwork.
+Example:
+example snort
+12. Change the RULE_PATH variable to the path of rulesfolder. var 
+RULE_PATHc:\snort\rules path to rules
+13. Change the path of all library files with the name and path on your system.and
+you must changethepath of snort_dynamicpreprocessorvariable.
+C:\Snort\lib\snort_dynamiccpreprocessor
+You need to do this to all library files in the “C:\Snort\lib” folder. The old path might 
+be: “/usr/local/lib/…”. you willneedto replace that path with your system path. Using 
+C:\Snort\lib
+14. Change the path of the “dynamicengine” variable value in the“snort.conf” file.
+Example:
+dynamicengine C:\Snort\lib\snort_dynamicengine\sf_engine.dll
+15 Add the paths for “include classification.config” and “include reference.config”
 files.
-● HDFS consists of two core components i.e.
-Name node-data partitioned across the DataNodes
-Data Node-Stores Data
-
-YARN-Yet Another Resource Negotiator, as the name implies, YARN is the
-one who helps to manage the resources across the clusters.
- MapReduce-MapReduce makes it possible to carry over the processing logic
-and helps to write applications which transform big data sets into a
-manageable one.
-● Map() performs sorting and filtering of data and thereby organizing them
-in the form of group.
-● Reduce(), as the name suggests does the summarization by aggregating
-the mapped data
-Hadoop Installation
-Step 1 – Installing Java
-● sudo apt update
-● sudo apt install openjdk-11-jdk
-verify the installed version of Java with the following command
-● java -version
-Step 2 – Create a Hadoop User
-Create a new user with
-name hadoop
-● sudo adduser hadoop
-Provide and confirm the
- new password
- Step 3 – Configure SSH Key-based Authentication
-SSH is primarily used for secure remote access to servers and devices
-Need to configure passwordless SSH authentication for the local system
-1.Change the user to hadoop
-● su - hadoop
-2.Run the following command to generate Public and Private Key Pairs
-● ssh-keygen -t rsa
-3.You will be asked to enter the filename. Just press Enter to complete the
-process.
-4.Append the generated public keys from id_rsa.pub to authorized_keys and set
-proper permission
-● cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-● chmod 640 ~/.ssh/authorized_keys
-5.Verify the passwordless SSH authentication
-● ssh localhost
-Type yes and hit Enter to authenticate the localhost
-Step 4 – Installing Hadoop
-change the user to hadoop
-● su - hadoop
-Download the latest version of Hadoop using the wget command
-● wget https://downloads.apache.org/hadoop/common/hadoop-3.3.0/
-hadoop-3.3.0.tar.gz
-Extract the Downloaded file
-● tar -xvzf hadoop-3.3.0.tar.gz
-● Rename the extracted directory to hadoop
- mv hadoop-3.3.0 hadoop
-Open the ~/.bashrc fIle ( nano ~/.bashrc)
-● Append the below lines to file.
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-export HADOOP_HOME=/home/hadoop/hadoop
-export HADOOP_INSTALL=$HADOOP_HOME
-export HADOOP_MAPRED_HOME=$HADOOP_HOME
-export HADOOP_COMMON_HOME=$HADOOP_HOME
-export HADOOP_HDFS_HOME=$HADOOP_HOME
-export HADOOP_YARN_HOME=$HADOOP_HOME
-export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
-export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
-export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"
-Save and close the file. Then, activate the environment variables with the following
-command: source ~/.bashrc
-● Set the JAVA_HOME in the Hadoop environment.
-● Open the Hadoop Environment File using the below given command
-nano $HADOOP_HOME/etc/hadoop/hadoop-env.sh
-● Append the java home in the file in the file
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-
-Step 5 – Configuring Hadoop
-create the namenode and datanode directories inside Hadoop home directory
-● mkdir -p ~/hadoopdata/hdfs/namenode
-● mkdir -p ~/hadoopdata/hdfs/datanode
-Edit the core-site.xml file and update with your system hostname.
-● nano $HADOOP_HOME/etc/hadoop/core-site.xml
-Append the Below given lines in the core-site.xml file
-<configuration>
-<property>
-<name>fs.default.name</name>
-<value>hdfs://localhost:9000</value>
-</property>
-</configuration>
- 
-● Edit the mapred-site.xml file
-nano $HADOOP_HOME/etc/hadoop/mapred-site.xml
-Append the Below given lines in the mapred-site.xml file
-<configuration>
-<property>
-<name>mapreduce.framework.name</name>
-<value>yarn</value>
-</property>
-</configuration>
-
-Edit the hdfs-site.xml file
-nano $HADOOP_HOME/etc/hadoop/hdfs-site.xml
-Append the Below given lines in the hdfs-site.xml file
-<configuration>
- <property>
- <name>dfs.replication</name>
- <value>1</value>
- </property>
- <property>
- <name>dfs.name.dir</name>
- <value>file:///home/hadoop/hadoopdata/hdfs/namenode</value>
- </property>
- <property>
- <name>dfs.data.dir</name>
- <value>file:///home/hadoop/hadoopdata/hdfs/datanode</value>
- </property>
-</configuration>
-
-Step 6 – Start Hadoop Cluster
-Format the Hadoop Namenode
-● hdfs namenode -format
-Start the Hadoop cluster
-● start-dfs.sh
- start the YARN service
-● start-yarn.sh
-To verify that the correct processes are running on each server
-● jps
+include c:\snort\etc\classification.config
+include c:\snort\etc\reference.config
+16. Remove the comment (#) on the line to allow ICMP rules, if it iscommented with 
+a#.
+include $RULE_PATH/icmp.rules
+17. You can also remove the comment of ICMP-info rules comment, if it is
+commented.
+include $RULE_PATH/icmp-info.rules
+18. To add log files to store alerts generated by snort, search for the “outputlog” test 
+in snort.conf and add the followingline:
+output alert_fast: snort-alerts.ids
+19. Comment (add a #) the whitelist $WHITE_LIST_PATH/white_list.rules and the
+blacklist
+Change the nested_ip inner , \ to nested_ip inner #, \
+20. Comment out (#) following lines:
+#preprocessornormalize_ip4
+#preprocessor normalize_tcp: ipsecnstream
+#preprocessor normalize_icmp4
+#preprocessornormalize_ip6
+#preprocessor normalize_icmp6
+21. Save the “snort.conf”file.
+22. To start snort in IDS mode, run the followingcommand:
+snort -c c:\snort\etc\snort.conf -l c:\snort\log -i 3
+If a log is created, select the appropriate program to open it. You can use WordPard 
+or NotePad++ to read the file.
+To generate Log files in ASCII mode, you can use following command while
+running snort in IDS mode:
+snort -A console -i3 -c c:\Snort\etc\snort.conf -l c:\Snort\log -K ascii
+23. Scan the computer that is running snort from another computer by usingPING or 
+NMap (ZenMap). After scanning or during the scan you can check the snortalerts.ids file in the log folder to insure it is logging properly. You will see IP address 
+folders appear
+OUTPUT:
+RESULT:
+Thus the Intrusion Detection System (IDS) has been demonstrated by using
+the Open Source Snort Intrusion Detection Tool.
 
 
 
-sudo usr/bin/vmware-installer -u vmware-player
+
+def receiver(YA,XB,q):
+return YA**XB%q
+def sender(YB,XA,q):
+return YB**XA%q
+def main():
+q= int(input("Enter the prime number(q): "))
+alpha = int(input("Enter the primitive root (alpha): "))
+XA = int(input("Enter Sender Secret Key(XA): "))
+XB= int(input("Enter Receiver Secret Key:(XB) "))
+YA = alpha**XA%q
+YB= alpha**XB%q
+print("Receiver Public Key :(KAB)", receiver(YA,XB,q))
+print("Sender Public Key (KAB): ", sender(YB,XA,q))
+main()
 
 
 
-virtualbox virtualbox-ext-pack in apt
-sudo apt-get install vagrant
-vagrant init -f hashicorp/bionic64
-vagrant up
-vagrant ssh
+
+
+from Crypto.Hash import SHA1
+hash_obj1 = SHA1.new()
+hash_obj2 = SHA1.new()
+with open('file1.txt', 'rb') as file1, open('file2.txt', 'rb') as file2:
+content1 = file1.read()
+content2 = file2.read()
+hash_obj1.update(content1)
+hash_obj2.update(content2)
+hexdigest1 = hash_obj1.hexdigest()
+hexdigest2 = hash_obj2.hexdigest()
+print(f'Digest of file#1: {hexdigest1}')
+print(f'Digest of file#2: {hexdigest2}')
+print('Contents match') if hexdigest1 == hexdigest2 else print('Contents mismatch')
 
 
 
-keystone
-for keystone you need mariadb
-provider - fernet
-configure apache http server
-
-
-glance
